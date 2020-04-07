@@ -37,12 +37,13 @@ import TodyRecommend from './TodyRecommend/TodyRecommend'
 export default {
   name: 'Home',
   components:{
-    TodyRecommend,
+    
     Brand,
-      Floor,
-      Like,
-      ListContainer,
-      Rank
+    Floor,
+    Like,
+    ListContainer,
+    Rank,
+    TodyRecommend,
   }
 }
 </script>

@@ -57,7 +57,12 @@
         */
         //this.$router.push(path:'/search',query:{keyword:this.keyword})
         //this.$router.push({path:'/search',params:{keyword:this.keyword}})
-        this.$router.push({name:'search',params:{keyword:this.keyword}})
+        
+        if(this.keyword){
+          this.$router.push({name:'search',params:{keyword:this.keyword}})
+        }else{
+          this.$router.push({name:'search'})
+        }
         //this.$router.replace('/search')
       }
     }

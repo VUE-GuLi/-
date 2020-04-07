@@ -10,9 +10,12 @@
 <script>
 import Header from './components/Header'
 import Footer from './components/Footer'
+import {reqBaseCategoryList} from '@/api'
 export default {
   name: 'App',
-
+  async mounted(){
+    const result =await reqBaseCategoryList()
+  },
   components: {
     Header,
     Footer
