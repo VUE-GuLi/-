@@ -1,9 +1,9 @@
 <template>
-  <div class='home'>
+  <div class="home">
     <!-- 商品分类导航 -->
-    <typeNav />
-
-    <!-- 列表 -->
+    <TypeNav />
+    
+    <!--列表-->
     <ListContainer />
 
     <!--今日推荐-->
@@ -23,31 +23,28 @@
 
     <!--商标-->
     <Brand />
-
   </div>
 </template>
 
 <script>
-import TodyRecommend from './TodyRecommend/TodyRecommend'
+  import TodyRecommend from './TodayRecommend/TodayRecommend'
   import Brand from './Brand/Brand'
   import Floor from './Floor/Floor'
   import Like from './Like/Like'
   import ListContainer from './ListContainer/ListContainer'
   import Rank from './Rank/Rank'
-export default {
-  name: 'Home',
-  components:{
-    
-    Brand,
-    Floor,
-    Like,
-    ListContainer,
-    Rank,
-    TodyRecommend,
+  export default {
+    name: 'Home',
+    components: { // 局部注册, 只能在当前组件中使用
+      TodyRecommend,
+      Brand,
+      Floor,
+      Like,
+      ListContainer,
+      Rank
+    }
   }
-}
 </script>
 
 <style lang="less" scoped>
-
 </style>

@@ -85,13 +85,13 @@
 </template>
 
 <script>
-export default {
+export default {
   name: 'Rank',
 }
 </script>
 
-<style lang="less" scoped>
-  .rank {
+<style  lang="less" scoped>
+.rank {
   width: 1200px;
   margin: 0 auto;
 

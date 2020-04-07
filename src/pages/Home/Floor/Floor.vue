@@ -93,13 +93,13 @@
 </template>
 
 <script>
-export default {
+export default {
   name: 'Floor',
 }
 </script>
 
-<style lang="less" scoped>
-  .floor {
+<style  lang="less" scoped>
+.floor {
       margin-top: 15px;
 
       .py-container {
