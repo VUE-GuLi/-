@@ -49,7 +49,11 @@
         keyword: ''
       }
     },
-
+    mounted() {
+          returnthis.$bus.$on('removeKeyword',()=>{
+            this.keyword=''
+          })
+        },
     methods: {
       toSearch () {
         /* 
@@ -76,6 +80,7 @@
         // this.$router.push(`/search/${this.keyword}`)
         // this.$router.push({path: '/search', params: {keyword: this.keyword}})  // 不可以
         const{path,query}=this.$root
+
         if (this.keyword) {
           //判断是否在搜索界面
           
@@ -95,6 +100,7 @@
             this.$router.push({name:'search'})
           }
         }
+        
 
         // this.$router.replace('/search')
 

@@ -12,40 +12,54 @@
           </ul>
           <ul class="fl sui-tag">
             <li class="with-x" v-if="options.categoryName">
-              {{options.categoryName}}<i>×</i>
+              {{options.categoryName}}<i @click="removeCategory">×</i>
             </li>
             <li class="with-x" v-if="options.keyword">
-              {{options.keyword}}<i>×</i>
+              {{options.keyword}}<i @click="removeKeyword">×</i>
+            </li>
+            <li class="with-x" v-if="options.trademark">
+              {{options.trademark}}<i @click="removeTrademark">×</i>
+            </li>
+
+
+            <li class="with-x" v-for="(prop, index) in options.props" :key="prop">
+              {{prop}}<i @click="removeProp(index)">×</i>
             </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector :setTrademark="setTrademark" :addProp="addProp"/>
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <!-- <li :class="{active: options.order.indexOf('1')===0}"> -->
+                <li :class="{active: isActive('1')}" @click="setOrder('1')">
+                  <a href="javascript:">
+                    综合{{getOrderIcon('1')}}
+                  </a>
                 </li>
                 <li>
-                  <a href="#">销量</a>
+                  <a href="javascript:">销量</a>
                 </li>
                 <li>
-                  <a href="#">新品</a>
+                  <a href="javascript:">新品</a>
                 </li>
                 <li>
-                  <a href="#">评价</a>
+                  <a href="javascript:">评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
+                <!-- <li :class="{active: options.order.indexOf('2')===0}"> -->
+                <li :class="{active: isActive('2')}" @click="setOrder('2')">
+                  <a href="javascript:">
+                    价格 {{getOrderIcon('2')}}
+                  </a>
                 </li>
-                <li>
-                  <a href="#">价格⬇</a>
-                </li>
+                <!-- <li>
+                  <a href="#">价格⬇ ⬆</a>
+                </li> -->
               </ul>
             </div>
           </div>
@@ -114,73 +128,221 @@
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+  import { mapGetters } from 'vuex'
   import SearchSelector from './SearchSelector/SearchSelector'
-  
   export default {
     name: 'Search',
-    data(){
-      return{
-        options:{
-          category1Id:'',//一级分类ID
-          category2Id:'',//二级分类ID
-          category3Id:'',//三级分类ID
-          categoryName:'',//分类名称
-          keyword:'',//搜索关键字
-          trademark:'',//品牌ID:品牌名称
-          order:'1:desc',//排序方式默认综合降序
-          pageNo:'1',//当前在第几页
-          pageSize:'5',//每页最多显示多少条数据
-          prors:[],//多个条件组件的数组[ID:属性值,属性名]
+
+    data () {
+      return {
+        options: {
+          category1Id: '', // 一级分类ID
+          category2Id: '', // 二级分类ID
+          category3Id: '', // 三级分类ID
+          categoryName: '', // 分类名称
+          keyword: '', // 搜索关键字
+          trademark: '', // '品牌ID:品牌名称'
+          order: '1:desc', // 排序方式 默认是综合降序   综合1,价格2 升序asc,降序desc  "2:desc"
+          pageNo: 1, // 当前第几页
+          pageSize: 5, // 每页最多显示多少条数据	
+          props: [], // 多个属性条件组件的数组   [‘属性ID:属性值:属性名’]
         }
       }
     },
-//只有在其它路由跳转到当前路由才会创建组件对象才执行，如果在当前路由转到当前路由(指定了新参数)不会创建组件对象不会执行
-    
+
+    // 只有在其它路由跳转到当前路由才会重新创建组件对象, 才执行mounted()
+    // 如果在当前路由跳转到当前路由(指定了新参数)不会重新创建组件对象,  不执行mounted()
+    // A ==> B  B组件对象就会创建    B ==> B  B组件对象不会创建
+
     mounted () {
-      //query:catgoryName/catgory1Id/category2Id/category3Id,params:keyword
-      const {query,params}=this.$route
-      //将query和params参数添加到options(覆盖之前的)
-      const options={
+      // query: {categoryName / category1Id / cateogry2Id / category3Id}
+      // params: {keyword}
+      const {query, params} = this.$route
+      // 将query和params参数数据添加到options(覆盖以前的)
+      const options = {
         ...this.options,
         ...query,
         ...params
+        // categoryName: query.categoryName,
+        // category1Id: query.category1Id,
+        // cateogry2Id: query.cateogry2Id,
+        // category3Id: query.category3Id,
+        // keyword: params.keyword
       }
-      //更新options
-      this.options=options
-      //根据搜索请求数据
+      // 更新options
+      this.options = options
+
+      // 根据搜索参数去请求搜索
       this.getProductList()
     },
-    watch:{
-      //搜索界面指定新的分类或关键字
-      '$route'(to,form){//路由params或query参数变化时自动调用
-        const {query,params}=to//to表示当前路由对象
-        const options={
-        ...this.options,
-        catgoryName:'',
-        catgory1Id:'',
-        catgory2Id:'',
-        catgory3Id:'',
-        ...query,
-        ...params
+
+    watch: {
+      // 在搜索界面指定新的分类或关键字时
+      '$route' (to, from) { // 路由params或query参数发生变化时自动调用
+         const {query, params} = to  // to代表当前路由对象
+         const options = {
+            ...this.options,
+            categoryName: '',    // 需要重置分类相关数据
+            category1Id: '',
+            category2Id: '',
+            category3Id: '',
+            
+            ...query,
+            ...params
+          }
+         this.options = options
+         this.getProductList()
       }
-      this.options=options
-      this.getProductList()
     },
-  },
-   computed: {
-     ...mapGetters(['goodsList'])
-   },
+
+    computed: {
+      ...mapGetters(['goodsList'])
+    },
+
     methods: {
-      //异步搜索商品列表
-      getProductList(){
-        this.$store.dispatch('getProductList',this.options)
+      /* 
+      异步搜索商品列表
+      */
+      getProductList () {
+        this.$store.dispatch('getProductList', this.options)
+      },
+
+      /* 
+      判断指定排序标记的项是否选中
+      */
+      isActive (orderFlag) { // 1 / 2
+        // order: '1:desc'  '2:desc'
+        return this.options.order.indexOf(orderFlag) === 0
+      },
+
+      /* 
+      设置新的order, 请求新的排序方式对应的商品列表  (排序是发生在后台, 不是发生在前台)
+      order: '1:desc'  综合降序
+      order: '1:asc'  综合升序
+      order: '2:desc'  价格降序
+      order: '2:asc'  价格升序
+      */
+      setOrder (orderFlag) {
+        // 得到当前项的标记和排序类型
+        // const arr = this.options.order.split(':')  // ['1', 'desc']
+        // const flag = arr[0] // '1'
+        // const orderType = arr[1] // 'desc'
+        let [flag, orderType] = this.options.order.split(':')  // ['1', 'desc']
+
+        // 在当前项上点击
+        if (orderFlag===flag) {
+          // 切换orderType
+          orderType = orderType==='desc' ? 'asc' : 'desc'
+        } else { // 不在当前项上点击
+          // 指定的flag为当前flag
+          flag = orderFlag
+          // 当前排序方式为降序(默认值)
+          orderType = 'desc'
+        }
+
+        // 指定一个新的order
+        this.options.order = flag + ':' + orderType
+
+        // 重新请求获取指定排序的列表
+        this.getProductList()
+      },
+
+      /* 
+      得到要显示的标识排序方式的图标
+      order: '1:desc'  综合降序
+      order: '1:asc'  综合升序
+      order: '2:desc'  价格降序
+      order: '2:asc'  价格升序
+      */
+      getOrderIcon (orderFlag) { // '1' / '2'
+        // 得到当前排序标记和排序类型
+        const [flag, orderType] = this.options.order.split(':')
+        // 如果2个排序标记相同, 返回排序图标显示
+        if (orderFlag===flag) {
+          return orderType==='desc' ? '⬇' : '⬆'
+        } else { // 不显示排序图标
+          return ''
+        }
+      },
+
+      /* 
+      设置新的品牌
+      */
+      setTrademark (id, name) {
+        // 更新options中的trademark
+        this.options.trademark = id + ':' + name
+        // 重新获取商品列表
+        this.getProductList()
+      },
+
+      /* 
+      添加一个商品属性
+      */
+      addProp (id, value, name) {
+        // 生成一个新的属性字符串
+        const prop = `${id}:${value}:${name}`
+
+        // 如果props中没有此prop才添加
+        if (this.options.props.indexOf(prop)===-1) {
+          // 添加到options中的props中
+          this.options.props.push(prop)  //  'props' of undefined
+          // 请求新的商品列表
+          this.getProductList()
+        }
+      },
+
+      /* 
+      删除一个商品属性
+      */
+      removeProp (index) {
+        // 删除props中指定下标的属性
+        this.options.props.splice(index, 1)
+
+        this.getProductList()
+      },
+
+
+      /* 
+      移除分类条件
+      */
+      removeCategory () {
+        this.options.categoryName = ''
+        this.options.category1Id = ''
+        this.options.category2Id = ''
+        this.options.category3Id = ''
+        // 重新获取商品列表
+        // this.getProductList()  // 有问题, 没有去除地址栏query参数
+        // 重新跳转到当前界面, 用于删除query参数
+        this.$router.replace(this.$route.path) // path中可能包含了keyword  去除query参数
+      },
+
+      /* 
+      移除关键字条件
+      */
+      removeKeyword () {
+        this.options.keyword = ''
+
+        // 通过全局总线分发删除了关键字的自定义事件
+        this.$bus.$emit('removeKeyword')
+
+        // 重新获取商品列表
+        // this.getProductList() // 有问题, 没有去除地址栏params参数
+        this.$router.replace({path: '/search', query: this.$route.query})  // 去除params参数
+      },
+
+      /* 
+      移除品牌条件
+      */
+      removeTrademark () {
+        this.options.trademark = ''
+        this.getProductList()
       }
     },
-    components:{
+
+    components: {
       SearchSelector
     }
-}
+  }
 </script>
 
 <style lang="less" scoped>
