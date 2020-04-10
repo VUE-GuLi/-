@@ -6,10 +6,13 @@
       <div @mouseenter="isShowFirst=true" 
         @mouseleave="hideFirst">
         <h2 class="all">全部商品分类</h2>
-        <div class="sort" v-if="isShowFirst" @click="toSearch">
+        <div class="sort" v-if="isShowFirst" 
+          @click="toSearch">
           <div class="all-sort-list2">
             <div class="item"  v-for="(c1, index) in categoryList" :key="c1.categoryId" 
-              :class="{item_on: index===currentIndex}" @mouseenter="showSubCategorys(index)">
+              :class="{item_on: index===currentIndex}" 
+              @mouseenter="showSubCategorys(index)"
+              >
               <!-- 
                 &.item_on {
                     background: #ccc;
@@ -20,9 +23,9 @@
               -->
               <h3>
                 <a href="javascript:" 
-                  :data-categoryName="c1.categoryName":data-category1Id="c1.categoryId"
+                  :data-categoryName="c1.categoryName"
+                  :data-category1Id="c1.categoryId"
                 >{{c1.categoryName}}</a>
-                <!-- <a href="javascript:">{{c1.categoryName}}</a> -->
                 <!-- <router-link :to="{path: '/search', query: {categoryName: c1.categoryName, category1Id: c1.categoryId}}">{{c1.categoryName}}</router-link> -->
               </h3>
               <div class="item-list clearfix">
@@ -30,7 +33,8 @@
                   <dl class="fore" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
                     <dt>
                       <a href="javascript:" 
-                        :data-categoryName="c2.categoryName":data-category2Id="c2.categoryId"
+                        :data-categoryName="c2.categoryName"
+                        :data-category2Id="c2.categoryId"
                       >{{c2.categoryName}}</a>
                       <!-- <a href="javascript:">{{c2.categoryName}}</a> -->
                       <!-- <router-link :to="{path: '/search', query: {categoryName: c2.categoryName, category2Id: c2.categoryId}}">{{c2.categoryName}}</router-link> -->
@@ -38,7 +42,8 @@
                     <dd>
                       <em v-for="(c3, index) in c2.categoryChild" :key="c3.categoryId">
                         <a href="javascript:" 
-                          :data-categoryName="c3.categoryName":data-category3Id="c3.categoryId"
+                          :data-categoryName="c3.categoryName"
+                          :data-category3Id="c3.categoryId"
                         >{{c3.categoryName}}</a>
                         <!-- <a href="javascript:">{{c3.categoryName}}</a> -->
                         <!-- <router-link :to="{path: '/search', query: {categoryName: c3.categoryName, category3Id: c3.categoryId}}">{{c3.categoryName}}</router-link> -->
@@ -68,9 +73,9 @@
 
 <script>
 import { mapState } from 'vuex'
-// import _ from 'lodash' // 引入包含所有工具函数方法的对象  ==> 会打包整个lodash库
-// 只引用throttle
-import throttle from 'lodash/throttle'// 对lodash实现按需引入打包
+// import _ from 'lodash' // 引入包含所有工具函数方法的对象  ==> 会打包整个lodash库  3.8M
+// 只引入要用的throttle
+import throttle from 'lodash/throttle'// 对lodash实现按需引入打包  2.5M
 export default {
   name: 'TypeNav',
 
@@ -84,7 +89,7 @@ export default {
   mounted () {
     // 得到当前路由路径
     const path = this.$route.path
-    // 不在首页指定隐藏一级分类列表
+    // 如果不在首页指定隐藏一级分类列表
     if (path!='/') {
       this.isShowFirst = false
     }
@@ -95,29 +100,34 @@ export default {
     /* categoryList () {
       return this.$store.state.home.baseCategoryList
     }, */
+    // ...mapState(['home']),   // {baseCategoryList: []}
     // ...mapState({home: 'home'}),   // {baseCategoryList: []}
     ...mapState({
       // 计算属性值由vue自动调用右侧的函数返回
       // state是vue自动传的总state对象
-      categoryList: state => state.home.baseCategoryList    
-      // [
-      //   {
-      //     categoryId: 1,
-      //     categoryName: '一级分类名',
-      //     categoryChild: [
-      //       {
-      //         categoryId: 1,
-      //         categoryName: '二级分类名',
-      //         categoryChild: [
-      //           {
-      //             categoryId: 1,
-      //             categoryName: '三级分类名',
-      //           }
-      //         ]
-      //       }
-      //     ]
-      //   }
-      // ]
+      categoryList: state => state.home.baseCategoryList,
+      /* 
+      
+      [
+        {
+          categoryId: 1,
+          categoryName: '一级分类名',
+          categoryChild: [
+            {
+              categoryId: 1,
+              categoryName: '二级分类名',
+              categoryChild: [
+                {
+                  categoryId: 1,
+                  categoryName: '三级分类名',
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      
+      */
     })
   },
 
@@ -138,7 +148,7 @@ export default {
     showSubCategorys: throttle(function (index) { // 直接通过throttle函数处理
       console.log('处理mouseenter事件的函数', index)
       this.currentIndex = index
-    }, 300),
+    }, 200),
 
     /* 
     点击某个分类项跳转到search路由
@@ -162,8 +172,18 @@ export default {
         } else if (category3id) {
           query.category3Id = category3id
         }
-        // 跳转路由, 并携带query参数
-        this.$router.push({path: '/search', query})
+        //得到当前路径 / 或/search 或者/search/xxx
+        const path=this.$route.path
+        
+        //如果当前已经在搜索界面
+        if(path.indexOf('/search')===0){
+          //跳转到搜索，path为原本路径(可能携带params参数)
+          this.$router.replace({name:'search',params, query})
+        }else{
+           // 当前没在搜索界面跳转路由, 并携带query参数,
+          this.$router.push({path: '/search', query})
+        }
+        
       }
     },
 

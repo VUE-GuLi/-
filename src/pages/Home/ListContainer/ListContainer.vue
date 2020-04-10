@@ -3,28 +3,11 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <div class="swiper-container">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <img src="/images/banner1.jpg" alt="">
-            </div>
-            <div class="swiper-slide">
-              <img src="/images/banner2.jpg" alt="">
-            </div>
-            <div class="swiper-slide">
-              <img src="/images/banner3.jpg" alt="">
-            </div>
-            <div class="swiper-slide">
-              <img src="/images/banner4.jpg" alt="">
-            </div>
-          </div>
-          <!-- 如果需要分页器 -->
-          <div class="swiper-pagination"></div>
-    
-          <!-- 如果需要导航按钮 -->
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-button-next"></div> 
-        </div>
+        <!-- 
+          banners为空数组 ==> 渲染Carousel ===> 创建Carousel, 调用mounted, 没有数据(长度为0)
+          异步获取banners数组 ==> 更新渲染Carousel ===> 调用watch的回调函数
+         -->
+        <Carousel :carouselList="banners"/>
       </div>
       <div class="right">
         <div class="news">
@@ -110,30 +93,17 @@
 </template>
 
 <script>
-import Swiper from 'swiper'
-import 'swiper/css/swiper.min.css'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'ListContainer',
-    mounted() {
-      new Swiper ('.swiper-container', {
-        //direction: 'vertical', // 垂直切换选项
-        loop: true, // 循环模式选项
-    
-        //分页器
-        pagination: {
-          el: '.swiper-pagination',
-        },   
-        // 前进后退按钮
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        }
-      })        
-    },
+
+    computed: {
+      ...mapState({
+        banners: state => state.home.banners
+      })
+    }
   }
- 
-  
 </script>
 
 <style lang="less" scoped>

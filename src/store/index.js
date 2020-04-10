@@ -17,6 +17,16 @@ export default new Vuex.Store({
   actions,
   getters,
 
- 
+  /* 
+  总状态的结构: 
+  {
+    user: {
+      userInfo: {}
+    },
+    home: {
+      baseCategoryList: []
+    }
+  }
+  */
   modules
 })

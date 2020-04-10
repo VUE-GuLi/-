@@ -1,5 +1,5 @@
 /* 
-对axios进行二次包装
+对axios进行二次包装 (专门针对mock的接口)
 1. 配置通用的基础路径和超时
 2. 显示请求进度条
 3. 成功返回的数据不再是response, 而直接是响应体数据response.data
@@ -15,8 +15,8 @@ import 'nprogress/nprogress.css'
 // 创建一个新的Axios的实例
 /* 1. 配置通用的基础路径和超时 */
 const ajax = axios.create({
-  baseURL: '/mock',  // 前缀路径针对mock接口
-  timeout: 20000, // 连接请求超时时间
+  baseURL: '/mock',  // 前缀路径
+  timeout: 10000, // 连接请求超时时间
 })
 
 // 添加请求拦截器

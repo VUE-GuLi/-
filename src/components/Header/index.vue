@@ -75,10 +75,25 @@
         // 使用params参数
         // this.$router.push(`/search/${this.keyword}`)
         // this.$router.push({path: '/search', params: {keyword: this.keyword}})  // 不可以
+        const{path,query}=this.$root
         if (this.keyword) {
-          this.$router.push({name: 'search', params: {keyword: this.keyword}})  // 可以
+          //判断是否在搜索界面
+          
+          if(path.indexOf('/search')===0){
+            this.$router.push({
+              name: 'search',
+              params: {keyword: this.keyword},
+              query
+            })
+          }else{
+            this.$router.push({name: 'search', params: {keyword: this.keyword}})
+            }  // 可以
         } else {
-          this.$router.push({name: 'search'})
+          if(path.indexOf('/search')===0){
+            this.$router.push({name:'search',query})
+          }else{
+            this.$router.push({name:'search'})
+          }
         }
 
         // this.$router.replace('/search')
