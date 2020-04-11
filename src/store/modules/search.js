@@ -12,13 +12,22 @@ const mutations = {
 }
 const actions={
   //根据指定搜索商品列表相关数据对象
-async getProductList({commit},searchParams){
-  //ajax请求数据
-  const result =await reqProductList(searchParams)
-  //成功交给mutation
+  async getProductList({commit},searchParams){
+    //如果不改变options
+    searchParams={...searchParams}
+    //过滤productList所有属性值为空串的属性
+    Object.keys(searchParams).forEach(key=>{//得到对象本身所有属性名的数组
+      if(searchParams[key]===''){
+        delete searchParams[key]
+      }
+    });
+  
+    //ajax请求数据
+    const result =await reqProductList(searchParams)
+    //成功交给mutation
     if(result.code===200){
-      const productList=result.data
-      commit('RECEIVE_PRODUCT_LIST',productList)
+    const productList=result.data
+    commit('RECEIVE_PRODUCT_LIST',productList)
     } 
   }
 }
