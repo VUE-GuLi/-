@@ -1,16 +1,10 @@
 <template>
-  <div class="swiper-container">
+  <div class="swiper-container" ref="swiper">
     <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
-        <img src="../images/s1.png">
-        <img src="../images/s2.png">
-        <img src="../images/s3.png">
+      <div class="swiper-slide" v-for="(skuImg,index) in skuImageList" :key="skuImg.id">
+        
+        <img :src="skuImg.UrlImg" :class="{active:currentIndex===index}"
+        @click="changeCurrentIndex(index)">
       </div>
     </div>
     <div class="swiper-button-next"></div>
@@ -19,10 +13,42 @@
 </template>
 
 <script>
-
+  import { mapGetters } from 'vuex'
   import Swiper from 'swiper'
   export default {
     name: "ImageList",
+    data(){
+      return {
+        currentindex:0
+      }
+    },
+    computed: {
+      ...mapGetters(['skuImageList'])
+    },
+    watch:{
+      skuImageList:{
+        handler(value){
+          if(value.length===0) return
+          this.$nextTick(()=>{
+            new Swiper (this.$refs.swiper,{
+              slidesPerView:5,
+              slidesPerGroup:2,
+              navigation:{
+                nextEl:'.swiper-button-next',
+                prevEl:'.swiper-button-prev',
+              },
+            })
+          })
+        },
+        immediate:true,
+      }   
+    },
+    methods: {
+      changeCurrentIndex(index){
+        this.currentindex=index
+        this.$emit('changeCurrentIndex',index)
+      }
+    },
   }
 </script>
 

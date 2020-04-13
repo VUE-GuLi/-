@@ -17,9 +17,11 @@
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap">
           <!--放大镜效果-->
-          <Zoom />
+          <Zoom v-if="skuImageList.length>0"
+          :imgUrl="skuImageList[currentImgIndex].imgUrl"
+          :bigImgUrl="skuImageList[currentImgIndex].imgUrl"/>
           <!-- 小图列表 -->
-          <ImageList />
+          <ImageList @changeCurrentIndex="changeCurrentIndex"/>
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
@@ -73,12 +75,12 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum">
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum--">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addToCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -335,13 +337,49 @@ import {mapGetters} from 'vuex'
 
   export default {
     name: 'Detail',
+    data(){
+      return{
+        currentImageIndex:0,
+        skuNum:1,
+      }
+    },
     mounted() {
       const skuId=this.$route.params.skuId
       //分发异步Action
       this.$store.dispatch('getDetailInfo',skuId)
     },
-    components: {
-      ...mapGetters(['categoryView']),
+    computed: {
+      ...mapGetters(['categoryView','skuInfo','spuSaleAttrList','skuImageList']),
+    },
+    methods: {
+      selectValue(value,valueList){
+        if(value.isChecked!=='1'){
+          valueList.forEach(v=>v.isChecked='0')
+          value.isChecked='1'
+        }
+      },
+      changeCurrentIndex(index){
+        this.currentImageIndex=index
+      }, 
+
+      async addToCart(){
+        const query={skuId:this.skuInfo.id,skuNum:this.skuNum}
+        //this.$store.dispatch('addToCart',{...query,callback:this.callback})
+        const errorMsg=await this.$store.dispatch('addToCart2',query)
+        this.callback(errorMsg)
+      },
+      callback(errorMsg){
+        const query={skuId:this.skuInfo.id,skuNum:this.skuNum}
+        if(!errorMsg){
+          console.log('====')
+          this.$router.push({path:'/addcartsuccess',query})
+        }else{
+          alert(errorMsg)
+        }
+      }
+      
+    },
+    components:{
       ImageList,
       Zoom
     }
