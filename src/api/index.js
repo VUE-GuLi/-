@@ -22,3 +22,4 @@ export const reqProductList = (searchParams)=>ajax.post(`/list`,searchParams
 // reqBanners().then(result => {
 //   console.log('result', result)
 // })
+export const reqDetailInfo = (skuId)=>ajax.get(`/item/${sluId}`)

@@ -10,20 +10,19 @@ import router from './router'
 import store from './store'
 import TypeNav from './components/TypeNav'
 import Carousel from './components/Carousel'
-import Pagination from './components/pagination'
-
+import Pagination from './components/Pagination'
 import './mock/mockServer' // 加载mock接口的主模块
 
 // 注册全局组件
 Vue.component('TypeNav', TypeNav) // 全局使用<TypeNav/> <type-nav/>
 Vue.component('Carousel', Carousel) // 全局使用<Carousel/> <carousel/>
-Vue.component('Pagination', Pagination)
+Vue.component('Pagination', Pagination) // 全局使用<Pagination/> <pagination/>
+
 new Vue({
-  beforeCreate() {
-    Vue.prototype.$bus=this
+  beforeCreate () {
+    Vue.prototype.$bus = this  // 将当前vm作为事件总线保存到Vue原型对象 ==> 所有组件都可见
   },
-})
-new Vue({
+
   // el: '#app'
   render: h => h(App),  // 将App组件对象渲染到页面上
   router, // 配置路由器(内部的路由才生效访问)

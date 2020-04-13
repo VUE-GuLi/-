@@ -10,11 +10,11 @@
     <!-- 连续页码 -->
     <!-- 注意v-if的优先级低于v-for: 遍历每个元素时解析v-if -->
     <button 
-      v-for="item in startEnd.end" 
-      :key="item" 
-      v-if="item>=startEnd.start"   
-      :class="{active: item===currentPage}"
-      @click="changeCurrentPage(item)">{{item}}</button>
+      v-for="no in startEnd.end" 
+      :key="no" 
+      v-if="no>=startEnd.start"   
+      :class="{active: no===currentPage}"
+      @click="changeCurrentPage(no)">{{no}}</button>
     <!-- 省略号 -->
     <button disabled v-if="startEnd.end<totalPages-1">···</button>
     <!-- 最后一页 -->
@@ -22,7 +22,7 @@
     <!--下一页-->
     <button :disabled="currentPage===totalPages" @click="changeCurrentPage(currentPage+1)">下一页</button>
     <!-- 总记录数 -->
-    <button disabled style="margin-left: 30px">共 {{pageConfig.total}} 条</button>
+    <button disabled style="margin-left: 30px">共 {{pageConfig.total}} 个</button>
   </div>
 </template>
 
@@ -46,9 +46,11 @@
       //data()不能直接读取data中的数据
       console.log('++++', this.currentPage)
       return{
-        currentPage:this.pageConfig.pageNo
+        currentPage: this.pageConfig.pageNo
       }
     },
+
+    
     computed: {
       //页码总数
       totalPages(){
@@ -57,16 +59,10 @@
         return Math.ceil (total/pageSize)//向上取整
       },
       startEnd(){
-        //得到已有依赖数据，
-          //当前页码
-          const currentPage=this.currentPage
-          //连续页码数
-          const showPageNo=this.pageConfig.showPageNo
-          const totalPages=this.totalPages
-        //计算产生需要的数据
-          let start=0
-          let end=0
-
+        let start=0
+        let end=0
+        //得到已有依赖数据，当前页码,连续页码数,计算产生需要的数据
+        const {totalPages, currentPage, pageConfig:{showPageNo}} = this // 多层级对象解构
           start=currentPage-Math.floor(showPageNo/2)  
           if(start<1){
             start=1
@@ -77,14 +73,48 @@
           if(end>totalPages){
             end=totalPages
             start=end-showPageNo+1
+            if(start<1){
+              start=1
+            }
           }
         //返回数据
         return {start,end}
+      },
+      startEnd2(){
+        const currentPage=this.currentPage
+        const showPageNo=this.pageConfig.showPageNo
+        const totalPages=this.totalPages
+        let start =0
+        let end=0
+        start= currentPage-Math.floor(showPageNo/2)
+        if(start<1){
+          start=1
+        }
+        end=start+showPageNo-1
+        if(end>totalPages){
+          end=totalPages
+          start=end-showPageNo+1
+          if(start<1){
+            start=1
+          }
+        }
+        return {start,end}
+      }
+    },
+
+    watch:{
+      //当接受的pageConfig中pageNo改变时调用
+      'pageConfig.pageNo'(value){
+        //将当前页码指定为外部传入的值
+        this.currentPage=value
+
       }
     },
     methods: {
       changeCurrentPage(page){
+        //修改当前页码
         this.currentPage=page
+        this.$emit('changeCurrentPage',page)
       }
     },
 

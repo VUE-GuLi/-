@@ -19,6 +19,11 @@ export default [
     props: (route) => ({ keyword1: route.params.keyword, keyword2: route.query.keyword })
   },
   {
+    name:'detail',
+    path:'/detail/:skuId',
+    component:Detail
+  },
+  {
     path: '/register',
     component: Register,
     meta: {

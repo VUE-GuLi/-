@@ -68,9 +68,9 @@
               <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javascript:">
+                    <router-link :to="{name:'detail',params:{skuId:goods.id}}">
                       <img :src="goods.defaultImg" />
-                    </a>
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -79,7 +79,7 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a href="javascript:">{{goods.title}}</a>
+                    <router-link :to="`/detail/${goods.id}`">{{goods.title}}</router-link>
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
@@ -94,7 +94,7 @@
           </div>
           <Pagination :pageConfig="{total:productList.total,
           pageNo:options.pageNo,showPageNo:3,pageSize:options.pageNo}"
-          @changeCurrentPage="changeCurrentPage"/>
+          @changeCurrentPage="getProductList"/>
         </div>
       </div>
     </div>
@@ -180,17 +180,19 @@
       /* 
       异步搜索商品列表
       */
-      getProductList () {
+      getProductList (currentPage=1) {
+        //根据指定页码异步搜索商品列表
+        this.options.pageNo=pageNo
         this.$store.dispatch('getProductList', this.options)
       },
       
-    
-      changeCurrentPage (currentPage) {
-        // 更新当前页码的条件数据
-        this.options.pageNo = currentPage
-        // 重新请求获取商品列表
-        this.getProductList()
-      },
+      
+      // changeCurrentPage (currentPage) {
+      //   // 更新当前页码的条件数据
+      //   //this.options.pageNo = currentPage
+      //   // 重新请求获取商品列表
+      //   this.getProductList(currentPage)
+      // },
       /* 
       判断指定排序标记的项是否选中
       */
