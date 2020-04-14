@@ -68,7 +68,8 @@
               <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <router-link :to="{name:'detail',params:{skuId:goods.id}}">
+                    <!-- <router-link :to="`/detail/${goods.id}`"> -->
+                    <router-link :to="{name: 'detail', params: {skuId: goods.id}}">
                       <img :src="goods.defaultImg" />
                     </router-link>
                   </div>
@@ -92,17 +93,23 @@
               </li>
             </ul>
           </div>
-          <Pagination :pageConfig="{total:productList.total,
-          pageNo:options.pageNo,showPageNo:3,pageSize:options.pageNo}"
-          @changeCurrentPage="getProductList"/>
+          
+          <Pagination :pageConfig="{
+              total: productList.total,  // 总数据个数
+              showPageNo: 3,
+              pageNo: options.pageNo,
+              pageSize: options.pageSize
+            }"
+            @changeCurrentPage="getProductList"
+          />
         </div>
       </div>
     </div>
   </div>
-</template>
+</template>"
 
 <script>
-  import { mapState, mapGetters } from 'vuex'
+  import {mapState, mapGetters } from 'vuex'
   import SearchSelector from './SearchSelector/SearchSelector'
   export default {
     name: 'Search',
@@ -115,7 +122,7 @@
           category3Id: '', // 三级分类ID
           categoryName: '', // 分类名称
           keyword: '', // 搜索关键字
-          trademark: '', // '品牌ID:品牌名称'
+          // trademark: '', // '品牌ID:品牌名称'
           order: '1:desc', // 排序方式 默认是综合降序   综合1,价格2 升序asc,降序desc  "2:desc"
           pageNo: 1, // 当前第几页
           pageSize: 5, // 每页最多显示多少条数据	
@@ -160,7 +167,6 @@
             category1Id: '',
             category2Id: '',
             category3Id: '',
-            
             ...query,
             ...params
           }
@@ -171,28 +177,31 @@
 
     computed: {
       ...mapState({
-        productList:state=>state.search.productList
+        productList: state => state.search.productList
       }),
       ...mapGetters(['goodsList'])
     },
 
     methods: {
       /* 
-      异步搜索商品列表
+      根据指定页码(默认值为1)异步搜索商品列表
       */
-      getProductList (currentPage=1) {
-        //根据指定页码异步搜索商品列表
-        this.options.pageNo=pageNo
+      getProductList (pageNo=1) {
+        this.options.pageNo = pageNo
         this.$store.dispatch('getProductList', this.options)
       },
-      
-      
+
+      /* 
+      当当前页码发生改变的监听回调
+      */
       // changeCurrentPage (currentPage) {
       //   // 更新当前页码的条件数据
-      //   //this.options.pageNo = currentPage
+      //   // this.options.pageNo = currentPage
       //   // 重新请求获取商品列表
       //   this.getProductList(currentPage)
       // },
+
+
       /* 
       判断指定排序标记的项是否选中
       */
@@ -256,10 +265,10 @@
       */
       setTrademark (id, name) {
         // 更新options中的trademark
-        //this.options.trademark = id + ':' + name不会触发界面更新
-        this.$set(this.options,'trademark',id+':'+name)
+        // this.options.trademark = id + ':' + name  // 不会触发界面更新
+        this.$set(this.options, 'trademark', id + ':' + name)
         // 重新获取商品列表
-        this.getProductList()
+        this.getProductList() 
       },
 
       /* 
@@ -321,9 +330,10 @@
       移除品牌条件
       */
       removeTrademark () {
-        this.options.trademark = ''
-        //delete this.options.trademark//不会触发界面更新
-        //this.$delete(this.options,'trademark')
+        this.options.trademark = ''  // 如果trademark是响应式的, 重新赋值会触发界面更新
+        // delete this.options.trademark // delete 删除已有属性不会触发界面更新
+        // this.$delete(this.options, 'trademark')
+
         this.getProductList()
       }
     },

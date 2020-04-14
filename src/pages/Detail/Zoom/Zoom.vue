@@ -1,59 +1,66 @@
 <template>
   <div class="spec-preview">
-    <img src="imgUrl" />
+    <img :src="imgUrl" />
     <div class="event" @mousemove="handleMove" ref="event"></div>
-    <div class="big" ref="bigImg">
-      <img src="birImgUrl" />
+    <div class="big">
+      <img :src="bigImgUrl" ref="bigImg"/>
     </div>
     <div class="mask" ref="mask"></div>
   </div>
 </template>
 
 <script>
-  import throttle from ''
+  import throttle from 'lodash/throttle'
   export default {
     name: "Zoom",
-    props:{
-      imgUrl:String,
-      bigImgUrl:String
+    props: {
+      imgUrl: String,
+      bigImgUrl: String
     },
+
     methods: {
-      handleMove(event){
-        //得到事件坐标
-        const {offsetX,offsetY}=event
-        //console.log(offsetX,offsetY)
-        const maskWidth=this.maskWidth
-        //
-        let left=0
-        let top=0
-        left=offsetX-maskWidth/2
-        top=offsetY-maskWidth/2
-        //
-        if(left<0){
-          left=0
-        }else if(left>mastWidth){
-          left=maskWidth
+      handleMove: throttle(function (event) { // 高频调用
+        // 得到事件坐标
+        const {offsetX, offsetY} = event
+        console.log(offsetX, offsetY)
+        // 得到mask的宽度
+        const maskWidth = this.maskWidth
+
+        // 计算当前mask要指定left和top
+        let left = 0
+        let top = 0
+        left = offsetX - maskWidth/2
+        top = offsetY - maskWidth/2
+
+        // left必须在[0, maskWidth]
+        if (left<0) {
+          left = 0
+        } else if (left>maskWidth) {
+          left = maskWidth
+        }
+        // top必须在[0, maskWidth]
+        if (top<0) {
+          top = 0
+        } else if (top>maskWidth) {
+          top = maskWidth
         }
 
-        if(top<0){
-          top=0
-        }else if(top>mastWidth){
-          top=maskWidth
-        }
-        const masDiv=this.$refs.mask
-        maskDiv.style.left=left+'px'
-        maskDiv.style.top=top+'px'
+        // 指定mask div的left和top样式
+        const maskDiv = this.$refs.mask
+        maskDiv.style.left = left + 'px'
+        maskDiv.style.top = top + 'px'
 
-        const bigImg=this.$refs.bigImg
-        bigImg.style.left=-2*left+'px'
-        bigImg.style.top=-2*top+'px'
-      }
+        // 指定大图 img的left和top样式
+        const bigImg = this.$refs.bigImg
+        bigImg.style.left = -2*left + 'px'
+        bigImg.style.top = -2*top + 'px'
+      }, 50),
     },
-    mounted() {
-      //得到遮罩宽度并保存,maskWidth不变的值没必要定义在data里
-      this.mastWidth=this.$refs.event.clientWidth/2
-      //console.log(this.mask.Width)
-    },
+    mounted () {
+      // 得到遮罩的宽度并保存
+      this.maskWidth = this.$refs.event.clientWidth/2   //maskWidth是一个不变的值, 没有必要定义data中
+      // console.log(this.maskWidth)
+    }
   }
 </script>
 

@@ -30,16 +30,16 @@
   </div>
 </template>
 
-
 <script>
   import {mapGetters} from 'vuex'
   export default {
     name: 'SearchSelector',
-    prors:{
-      setTrademark:Function,
-      addProp:Function
 
+    props: {
+      setTrademark: Function,
+      addProp: Function
     },
+
     computed: {
       ...mapGetters(['trademarkList', 'attrsList'])
     }

@@ -148,7 +148,7 @@ export default {
     showSubCategorys: throttle(function (index) { // 直接通过throttle函数处理
       console.log('处理mouseenter事件的函数', index)
       this.currentIndex = index
-    }, 200),
+    }, 300),
 
     /* 
     点击某个分类项跳转到search路由
@@ -172,18 +172,19 @@ export default {
         } else if (category3id) {
           query.category3Id = category3id
         }
-        //得到当前路径 / 或/search 或者/search/xxx
-        const path=this.$route.path
         
-        //如果当前已经在搜索界面
-        if(path.indexOf('/search')===0){
-          //跳转到搜索，path为原本路径(可能携带params参数)
-          this.$router.replace({name:'search',params, query})
-        }else{
-           // 当前没在搜索界面跳转路由, 并携带query参数,
+        // 得到当前路由路径     /  或者 /search 或者 /search/xxx
+        const {path, params} = this.$route
+
+        // 如果当前已经在搜索界面
+        if (path.indexOf('/search')===0) {
+          // 跳转到搜索, path为原本的路径(可能携带了params参数)
+          // this.$router.replace({path, query}) // 用replace()是为了后面能直接回退到home
+          this.$router.replace({name: 'search', params, query})
+        } else { // 当前没在搜索界面
+          // 跳转路由, 并携带query参数
           this.$router.push({path: '/search', query})
         }
-        
       }
     },
 

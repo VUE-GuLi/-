@@ -7,6 +7,8 @@ import Register from '@/pages/Register'
 import Login from '@/pages/Login'
 import Detail from '@/pages/Detail'
 import AddCartSuccess from '@/pages/AddCartSuccess'
+import ShopCart from '@/pages/ShopCart'
+
 export default [
   {
     path: '/',
@@ -19,15 +21,23 @@ export default [
     // 将query/params参数映射成props传递给路由组件
     props: (route) => ({ keyword1: route.params.keyword, keyword2: route.query.keyword })
   },
+
   {
-    name:'detail',
-    path:'/detail/:skuId',
-    component:Detail
+    name: 'detail',
+    path: '/detail/:skuId',
+    component: Detail,
+  },
+
+  {
+    path: '/addcartsuccess',
+    component: AddCartSuccess,
   },
   {
-    path:'/addcartsuccess',
-    component:AddCartSuccess,
+    path: '/shopcart',
+    component: ShopCart,
   },
+
+
   {
     path: '/register',
     component: Register,

@@ -10,16 +10,16 @@
         <span>{{categoryView.category1Name}}</span>
         <span>{{categoryView.category2Name}}</span>
         <span>{{categoryView.category3Name}}</span>
-       
       </div>
       <!-- 主要内容区域 -->
       <div class="mainCon">
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap">
           <!--放大镜效果-->
-          <Zoom v-if="skuImageList.length>0"
-          :imgUrl="skuImageList[currentImgIndex].imgUrl"
-          :bigImgUrl="skuImageList[currentImgIndex].imgUrl"/>
+          <Zoom 
+            v-if="skuImageList.length>0"
+            :imgUrl="skuImageList[currentImgIndex].imgUrl" 
+            :bigImgUrl="skuImageList[currentImgIndex].imgUrl"/>
           <!-- 小图列表 -->
           <ImageList @changeCurrentIndex="changeCurrentIndex"/>
         </div>
@@ -66,18 +66,23 @@
           <div class="choose">
             <div class="chooseArea">
               <div class="choosed"></div>
-              <dl v-for="(attr,index) in spuSaleAttrList" :key="attr.id">
-                <dt class="title">{{attr.saleArrName}}</dt>
-                <dd changepirce="0" v-for="(value,index) in attr.spuSaleAttrValueList" 
-                :key="value.id" :class="{active:value.isChecked==='1'}">{{value.saleAttrValueName}}</dd>
-              
+              <dl v-for="(attr, index) in spuSaleAttrList" :key="attr.id">
+                <dt class="title">{{attr.saleAttrName}}</dt>
+                <dd 
+                  changepirce="0" 
+                  v-for="(value, index) in attr.spuSaleAttrValueList" 
+                  :key="value.id" :class="{active: value.isChecked==='1'}" 
+                  @click="selectValue(value, attr.spuSaleAttrValueList)"
+                >
+                  {{value.saleAttrValueName}}
+                </dd>
               </dl>
             </div>
             <div class="cartWrap">
               <div class="controls">
                 <input autocomplete="off" class="itxt" v-model="skuNum">
                 <a href="javascript:" class="plus" @click="skuNum++">+</a>
-                <a href="javascript:" class="mins" @click="skuNum--">-</a>
+                <a href="javascript:" class="mins" @click="skuNum--" v-if="skuNum>1">-</a>
               </div>
               <div class="add">
                 <a href="javascript:" @click="addToCart">加入购物车</a>
@@ -331,55 +336,81 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+  import {mapGetters} from 'vuex'
   import ImageList from './ImageList/ImageList'
   import Zoom from './Zoom/Zoom'
 
   export default {
     name: 'Detail',
-    data(){
-      return{
-        currentImageIndex:0,
-        skuNum:1,
+
+    data () {
+      return {
+        currentImgIndex: 0, // 当前图片下标
+        skuNum: 1, // 商品的数量
       }
     },
-    mounted() {
-      const skuId=this.$route.params.skuId
-      //分发异步Action
-      this.$store.dispatch('getDetailInfo',skuId)
+
+    mounted () {
+      // 取出skuId的params参数
+      const skuId = this.$route.params.skuId
+      // 分发给获取商品详情的异步action
+      this.$store.dispatch('getDetailInfo', skuId)
     },
+
     computed: {
-      ...mapGetters(['categoryView','skuInfo','spuSaleAttrList','skuImageList']),
+      ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList', 'skuImageList'])
     },
+
     methods: {
-      selectValue(value,valueList){
-        if(value.isChecked!=='1'){
-          valueList.forEach(v=>v.isChecked='0')
-          value.isChecked='1'
+      /* 
+      选择某个属性值
+      */
+      selectValue (value, valueList) {
+        // 如果当前项没有选中才处理
+        if (value.isChecked!=='1') {
+          // 将所有的项都先指定为不选择
+          valueList.forEach(v => v.isChecked = '0')
+          // 选中当前的
+          value.isChecked = '1'
         }
       },
-      changeCurrentIndex(index){
-        this.currentImageIndex=index
-      }, 
 
-      async addToCart(){
-        const query={skuId:this.skuInfo.id,skuNum:this.skuNum}
-        //this.$store.dispatch('addToCart',{...query,callback:this.callback})
-        const errorMsg=await this.$store.dispatch('addToCart2',query)
+      /* 
+      changeCurrentIndex事件的回调函数
+       */
+      changeCurrentIndex (index) {
+        // 更新当前的currentImgIndex
+        this.currentImgIndex = index
+      },
+
+      /* 
+      将当前商品添加到购物车, 成功后跳转到成功界面
+      */
+      async addToCart () {
+        const query = {skuId: this.skuInfo.id, skuNum: this.skuNum}
+        // 分发添加购物车的action
+        // this.$store.dispatch('addToCart', {...query, callback: this.callback})
+        const errorMsg = await this.$store.dispatch('addToCart2', query)
         this.callback(errorMsg)
       },
-      callback(errorMsg){
-        const query={skuId:this.skuInfo.id,skuNum:this.skuNum}
-        if(!errorMsg){
-          console.log('====')
-          this.$router.push({path:'/addcartsuccess',query})
-        }else{
+
+      callback (errorMsg) {
+
+        const query = {skuId: this.skuInfo.id, skuNum: this.skuNum}
+        // 如果成功了
+        if (!errorMsg) {
+          
+          // 在跳转前将skuInfo保存到sessionStorage (key=value, value只能是字符串)
+          window.sessionStorage.setItem('SKU_INFO_KEY', JSON.stringify(this.skuInfo))
+
+          this.$router.push({path: '/addcartsuccess', query})
+        } else {
           alert(errorMsg)
         }
       }
-      
     },
-    components:{
+    
+    components: {
       ImageList,
       Zoom
     }

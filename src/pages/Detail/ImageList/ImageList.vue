@@ -1,10 +1,9 @@
 <template>
   <div class="swiper-container" ref="swiper">
     <div class="swiper-wrapper">
-      <div class="swiper-slide" v-for="(skuImg,index) in skuImageList" :key="skuImg.id">
-        
-        <img :src="skuImg.UrlImg" :class="{active:currentIndex===index}"
-        @click="changeCurrentIndex(index)">
+      <div class="swiper-slide" v-for="(skuImg, index) in skuImageList" :key="skuImg.id">
+        <img :src="skuImg.imgUrl" :class="{active: currentIndex===index}" 
+          @click="changeCurrentIndex(index)">
       </div>
     </div>
     <div class="swiper-button-next"></div>
@@ -17,41 +16,51 @@
   import Swiper from 'swiper'
   export default {
     name: "ImageList",
-    data(){
+
+    data () {
       return {
-        currentindex:0
+        currentIndex: 0, // 当前图片的下标
       }
     },
+
     computed: {
       ...mapGetters(['skuImageList'])
     },
-    watch:{
-      skuImageList:{
-        handler(value){
-          if(value.length===0) return
-          this.$nextTick(()=>{
-            new Swiper (this.$refs.swiper,{
-              slidesPerView:5,
-              slidesPerGroup:2,
-              navigation:{
-                nextEl:'.swiper-button-next',
-                prevEl:'.swiper-button-prev',
+
+    watch: {
+      skuImageList: {
+        handler (value) {
+          // 如果图片数组长度为0, 直接结束
+          if (value.length==0) return
+          // 延迟到界面更新后才创建swiper对象
+          this.$nextTick(() => {
+            new Swiper(this.$refs.swiper, {
+              slidesPerView: 5, // 一次显示5页
+              slidesPerGroup: 2, // 以2页为单位翻页
+              navigation: { //指定翻页按钮
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
               },
             })
-          })
+          }) 
         },
-        immediate:true,
-      }   
-    },
-    methods: {
-      changeCurrentIndex(index){
-        this.currentindex=index
-        this.$emit('changeCurrentIndex',index)
+        immediate: true, // 初始化立即调用
       }
     },
+
+    methods: {
+      /* 
+      修改当前图片下标
+      */
+      changeCurrentIndex (index) {
+        // 改变当前下标
+        this.currentIndex = index
+        // 分发自定义事件, 通知父组件
+        this.$emit('changeCurrentIndex', index)
+      }
+    }
   }
 </script>
-
 <style lang="less" scoped>
   .swiper-container {
     height: 56px;
