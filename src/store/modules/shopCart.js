@@ -15,6 +15,47 @@ const mutations = {
 const actions = {
 
   /* 
+  设置购物项的选中状态
+  */
+ async checkCartItem ({commit}, {skuId, isChecked}) {
+   const result = await reqCheckCartItem(skuId, isChecked)
+   if (result.code!==200) {
+     throw new Error('勾选购物项失败')
+   }
+ },
+
+  /* 
+  删除某个购物项的异步action
+  */
+  async deleteCartItem ({commit}, skuId) {
+    const result = await reqDeleteCartItem(skuId)
+    /* if (result.code===200) {
+      // 成功了, 告诉组件重新获取购物车列表数据
+
+    } else {// 失败了, 告诉组件显示失败的提示
+
+    } */
+    return result.code===200 ? '' : result.message || '删除购物项失败'
+  
+  }, 
+
+  async deleteCartItem2 ({commit}, skuId) {
+    const result = await reqDeleteCartItem(skuId)
+    /* if (result.code===200) {
+      // 成功了, 告诉组件重新获取购物车列表数据
+
+    } else {// 失败了, 告诉组件显示失败的提示
+
+    } */
+    // return result.code===200 ? '' : result.message || '删除购物项失败'
+    if (result.code!==200) { // 如果删除失败, 抛出一个error, error包含要显示的提示文本
+      throw new Error('删除购物项失败')
+      // return Promise.reject(new Error('删除购物项失败'))
+      // return new Error('删除购物项失败')  不可以
+    }
+  },
+
+  /* 
   获取购物车数据列表的异步action
   */
   async getCartList ({commit}) {
@@ -40,6 +81,19 @@ const actions = {
   async addToCart2 ({commit}, {skuId, skuNum}) {
     const result = await reqAddToCart(skuId, skuNum)
     return result.code===200 ? '' : (result.message || '添加购物车失败')
+  },
+
+  async addToCart3 ({dispatch}, {skuId, skuNum}) {
+    const result = await reqAddToCart(skuId, skuNum)
+    if (result.code===200) { // 成功了
+      // 分发请求获取最新购物车列表的action
+      dispatch('getCartList')
+    } else { // 失败了
+      // 可以直接提示
+      alert(result.message || '添加购物车失败')
+      // 选择让组件处理错误提示
+      // return (result.message || '添加购物车失败')
+    }
   }
 }
 const getters = {
@@ -82,7 +136,22 @@ const getters = {
   */
   isAllChecked (state) {
     // arr.every(): 判断所有的元素是否都满足条件
-    return state.cartList.every((item , index) => item.isChecked===1)
+    return state.cartList.length>0 && state.cartList.every((item , index) => item.isChecked===1)
+  },
+
+  /* 
+  所有选中购物项的数组
+  */
+  selectedItems (state) {
+    // filter(): 返回所有满足条件的数组元素组成的新数组
+    // return state.cartList.filter((item, index) => item.isChecked===1)
+    // reduce(): 返回累计累加后的最后结果
+    return state.cartList.reduce((pre, item) => {
+      if (item.isChecked===1) {
+        pre.push(item)
+      }
+      return pre // 就是初始指定的数组, 只是很可能前面添加了item元素
+    }, [])
   }
 }
 
