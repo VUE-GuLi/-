@@ -60,8 +60,13 @@
       return {
         mobile: '13611111111', // 手机号
         password: '111111', // 密码
+<<<<<<< HEAD
         password2: '123', // 确认密码
         code: '1234', // 一次性图形验证
+=======
+        password2: '111111', // 确认密码
+        code: '', // 一次性图形验证
+>>>>>>> dev
         isAgree: true, // 是否同意
       }
     },
@@ -138,7 +143,11 @@
 
       .content {
         // text-align: center;
+<<<<<<< HEAD
         padding-left: 390;
+=======
+        padding-left: 390px;
+>>>>>>> dev
         margin-bottom: 18px;
 
         label {

@@ -68,7 +68,11 @@
           <i class="summoney">{{totalPrice}}</i>
         </div>
         <div class="sumbtn">
+<<<<<<< HEAD
           <a class="sum-btn" href="###" target="_blank">结算</a>
+=======
+          <a class="sum-btn" href="javascript:" @click="toTrade">结算</a>
+>>>>>>> dev
         </div>
       </div>
     </div>
@@ -91,6 +95,13 @@
 
     methods: {
 
+<<<<<<< HEAD
+=======
+      toTrade () {
+        this.$router.push('/trade')
+      },
+
+>>>>>>> dev
       /* 
       修改某个购物项的数量
       */

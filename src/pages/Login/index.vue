@@ -17,11 +17,19 @@
             <form action="##">
               <div class="input-text clearFix">
                 <span></span>
+<<<<<<< HEAD
                 <input type="text" placeholder="邮箱/用户名/手机号">
               </div>
               <div class="input-text clearFix">
                 <span class="pwd"></span>
                 <input type="text" placeholder="请输入密码">
+=======
+                <input type="text" placeholder="手机号" v-model="mobile">
+              </div>
+              <div class="input-text clearFix">
+                <span class="pwd"></span>
+                <input type="password" placeholder="请输入密码" v-model="password">
+>>>>>>> dev
               </div>
               <div class="setting clearFix">
                 <label class="checkbox inline">
@@ -30,7 +38,11 @@
                 </label>
                 <span class="forget">忘记密码？</span>
               </div>
+<<<<<<< HEAD
               <button class="btn">登&nbsp;&nbsp;录</button>
+=======
+              <button class="btn" @click.prevent="login">登&nbsp;&nbsp;录</button>
+>>>>>>> dev
             </form>
 
             <div class="call clearFix">
@@ -66,8 +78,70 @@
 </template>
 
 <script>
+<<<<<<< HEAD
   export default {
     name: 'Login',
+=======
+  // import store from '@/store'
+  export default {
+    name: 'Login',
+    data () {
+      return {
+        mobile: '',
+        password: ''
+      }
+    },
+
+    methods: {
+      login () {
+        const {mobile, password} = this
+
+        // 做前台校验
+
+        // 发异步登陆请求
+        this.$store.dispatch('login', {mobile, password})
+          .then(() => { // 登陆成功
+            // 跳转到首页
+            // this.$router.replace('/')
+
+            // 得到需要自动跳转的路由路径 (可能有也可能没有)
+            const {redirect} = this.$route.query
+
+            // 跳转到前面想去没能去成的路由, 如果没有就去首页
+            this.$router.replace(redirect || '/')
+
+          })
+          .catch(error => { // 登陆失败
+            alert(error.message)
+          })
+      }
+    },
+
+    beforeRouteEnter: (to, from, next) => { // 在即将跳转Login时调用
+      /* 
+      报错: Cannot read property '$store' of undefined
+      分析: beforeRouteEnter()是在路由组件对象创建前调用的, this是undefined, 不能直接使用
+
+      */
+      // 如果已经登陆, 自动跳转到首页
+      /* 错误的做法 */
+      // if (this.$store.state.user.userInfo.name) {
+      //   next('/')
+      // } else { // 如果没登陆, 放行显示登陆界面
+      //   next()
+      // }
+
+      next(component => { // 此回调函数在组件对象被创建后才自动执行, 且传入了组件对象
+        if (component.$store.state.user.userInfo.name) { // 如果已经登陆, 自动跳转到首页
+          next('/')
+        } else { // 如果没登陆, 放行显示登陆界面
+          next()
+        }
+      })
+
+
+    }
+>>>>>>> dev
   }
 </script>
 
