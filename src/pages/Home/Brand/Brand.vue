@@ -1,5 +1,5 @@
 <template>
-    <div class="brand">
+  <div class="brand">
     <div class="py-container">
       <ul class="brand-list">
         <li class="brand-item">
@@ -38,13 +38,12 @@
 </template>
 
 <script>
-export default {
-  name: 'Brand',
-}
+  export default {
+    name: 'Brand',
+  }
 </script>
-  
+
 <style lang="less" scoped>
-  <style lang="less" scoped>
   .brand {
     margin: 10px 0;
 
